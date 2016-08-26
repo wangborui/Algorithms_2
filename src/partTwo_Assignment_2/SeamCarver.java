@@ -85,31 +85,47 @@ public class SeamCarver {
 
     public int[] findHorizontalSeam() // sequence of indices for horizontal seam
     {
-        return null;
+        //transpose energy 2d array
+        energy = transpose(energy);
+        int []seam = findVerticalSeam();
+        energy = transpose(energy);
+//        for(double []a:energy){
+//            for(double b: a)
+//                StdOut.printf("%9.0f ",b);
+//            StdOut.println();
+//        }
+        return seam;
     }
-
+    private double [][] transpose(double [][] matrix){
+        double [][] transposedEnergy = new double[matrix[0].length][matrix.length];
+ 
+        for (int w = 0; w < matrix[0].length; w++) {
+             for (int h = 0; h < matrix.length; h++) {
+                transposedEnergy[w][h] = matrix[h][w];
+            }
+        }
+        H = transposedEnergy.length;
+        W = transposedEnergy[0].length;
+        return transposedEnergy;
+    }
     public int[] findVerticalSeam() // sequence of indices for vertical seam
-    {
+    {    
+
         double[][] distance = new double[height()][width()];
         int[][] edgeTo = new int[height()][width()];
 
         for (int row = 0; row < height(); row++) {
             for (int col = 0; col < width(); col++) {
-                if (row == 0) {
-                    distance[row][col] = 1000;
-                    //sentinel as the root of shortest path
-                } else {
-                    distance[row][col] = Double.MAX_VALUE;
-                }
+                if (row != 0) {
+                     distance[row][col] = Double.MAX_VALUE;
+                 }  
             }
         }
         for (int row = 0; row < height() - 1; row++) {
             for (int col = 0; col < width(); col++) {
-                //StdOut.printf("%9.0f ", energy[row][col]);
-                relax(row, col, distance, edgeTo);
+                 relax(row, col, distance, edgeTo);
             }
-            // StdOut.println();
-        }
+         }
 
         return seam(distance, edgeTo);
     }
@@ -126,8 +142,8 @@ public class SeamCarver {
             }
         }
         int height = height() - 1;
-
-        for (int e = edgeTo[height][minIndex]; e != -1 && height >= 0; e = edgeTo[height--][e]) {
+        //trace edges back to the top root
+        for (int e = edgeTo[height][minIndex]; height >= 0; e = edgeTo[height--][e]) {
             seam[height] = e;
         }
         return seam;
@@ -147,7 +163,6 @@ public class SeamCarver {
                 edgeTo[row + 1][col + i] = col;
             }
         }
-
     }
 
     public void removeHorizontalSeam(int[] seam) // remove horizontal seam from current picture
@@ -155,12 +170,21 @@ public class SeamCarver {
         if (seam == null) {
             throw new java.lang.NullPointerException("seam is null");
         }
-        if (H <= 1) {
+        if (height() <= 1) {
             throw new java.lang.IllegalArgumentException("height of the picture is too small");
         }
-        if (seam.length != W) {
+        if (seam.length != width()) {
             throw new java.lang.IllegalArgumentException("seam is invalid");
         }
+        energy = transpose(energy);
+        for (int h = 0; h < height(); h++) {
+            for (int s = seam[h] + 1; s < width(); s++) {
+                energy[h][s - 1] = energy[h][s];
+            }
+        }
+        energy = transpose(energy);
+        //reduce height after removal
+        H--;
     }
 
     public void removeVerticalSeam(int[] seam) // remove vertical seam from current picture
@@ -168,24 +192,44 @@ public class SeamCarver {
         if (seam == null) {
             throw new java.lang.NullPointerException("seam is null");
         }
-        if (W <= 1) {
+        if (width() <= 1) {
             throw new java.lang.IllegalArgumentException("width of the picture is too small");
         }
-        if (seam.length != H) {
+        if (seam.length != height()) {
             throw new java.lang.IllegalArgumentException("seam is invalid");
         }
+        //double for loop going from top to bottom
+        for(int h = 0; h < height(); h++){
+            for(int s = seam[h] + 1; s < width(); s++){
+                energy[h][s-1] = energy[h][s];
+            }
+        }
+        //reduce width after seam removal
+        W--;
     }
-
+    private void printEnergy(){
+         for(int h = 0; h < height(); h++){
+            for(int w = 0; w < width(); w++)
+                StdOut.printf("%9.0f ",energy[h][w]);
+            StdOut.println();
+        }
+    }
     public static void main(String[] args) {
         Picture picture = new Picture(
                 new File("C:\\Users\\Borui Wang\\Desktop\\Borui Wang\\Coursera\\Algorithms Part 2\\"
                         + "Algorithms Part 2\\assignments\\ProgrammingAssignment2SeamCarvingHelpCenter\\"
-                        + "seamCarving-testing\\seamCarving\\diagonals.png"));
+                        + "seamCarving-testing\\seamCarving\\5x6.png"));
 
         SeamCarver sc = new SeamCarver(picture);
         sc.findVerticalSeam();
-        for(int a:sc.findVerticalSeam() )
-        StdOut.println(a);
+        //StdOut.println();
+//        sc.printEnergy();
+//        for(int a:sc.findHorizontalSeam() )
+//        StdOut.println(a);
+       // StdOut.println(sc.findHorizontalSeam());
+//        sc.removeHorizontalSeam(sc.findHorizontalSeam());
+//        sc.printEnergy();
+        
         //StdOut.println( sc.energy(1, 2));
     }
 }
