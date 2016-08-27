@@ -21,7 +21,7 @@ import java.io.File;
 public class ShowEnergy {
 
     public static void main(String[] args) {
-        Picture picture = new Picture(new File("C:\\Users\\Borui Wang\\Desktop\\Borui Wang\\Coursera\\Algorithms Part 2\\Algorithms Part 2\\assignments\\ProgrammingAssignment2SeamCarvingHelpCenter\\seamCarving-testing\\seamCarving\\HJocean.png"));
+        Picture picture = new Picture(new File("C:\\Users\\Borui Wang\\Desktop\\Borui Wang\\Coursera\\Algorithms Part 2\\Algorithms Part 2\\assignments\\ProgrammingAssignment2SeamCarvingHelpCenter\\seamCarving-testing\\seamCarving\\chameleon.png"));
         StdOut.printf("image is %d columns by %d rows\n", picture.width(), picture.height());
         picture.show();        
         SeamCarver sc = new SeamCarver(picture);

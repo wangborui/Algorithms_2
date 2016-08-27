@@ -15,17 +15,20 @@ package partTwo_Assignment_2;
 import edu.princeton.cs.algs4.Picture;
 import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.Stopwatch;
+import java.io.File;
 
 public class ResizeDemo {
     public static void main(String[] args) {
-        if (args.length != 3) {
-            StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
-            return;
-        }
+//        if (args.length != 3) {
+//            StdOut.println("Usage:\njava ResizeDemo [image filename] [num cols to remove] [num rows to remove]");
+//            return;
+//        }
 
-        Picture inputImg = new Picture(args[0]);
-        int removeColumns = Integer.parseInt(args[1]);
-        int removeRows = Integer.parseInt(args[2]); 
+        Picture inputImg = new Picture(new File("C:\\Users\\Borui Wang\\Desktop\\Borui Wang\\Coursera\\Algorithms Part 2\\"
+                        + "Algorithms Part 2\\assignments\\ProgrammingAssignment2SeamCarvingHelpCenter\\"
+                        + "seamCarving-testing\\seamCarving\\chameleon.png"));
+        int removeColumns = 200;
+        int removeRows = 100;
 
         StdOut.printf("image is %d columns by %d rows\n", inputImg.width(), inputImg.height());
         SeamCarver sc = new SeamCarver(inputImg);
