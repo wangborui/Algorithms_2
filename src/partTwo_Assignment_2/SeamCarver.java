@@ -48,8 +48,12 @@ public class SeamCarver {
         color = new double[H][W];
         for (int h = 0; h < H; h++) {
             for (int w = 0; w < W; w++) {
-                energy[h][w] = energy(w, h);
                 color[h][w] = p.get(w, h).getRGB();
+            }
+        }
+         for (int h = 0; h < H; h++) {
+            for (int w = 0; w < W; w++) {             
+                energy[h][w] = energy(w, h);
             }
         }
     }
@@ -87,23 +91,37 @@ public class SeamCarver {
         if (x == 0 || x == width() - 1 || y == 0 || y == height() - 1) {
             return 1000;
         }
-
-        double xSq = getXSq(x, y);
-        double ySq = getYSq(x, y);
+        //reverse x and y
+        double xSq = getXSq(y, x);
+        double ySq = getYSq(y, x);
         return Math.sqrt(xSq + ySq);
     }
 
-    private double getYSq(int x, int y) {
-        int rY = p.get(x, y - 1).getRed() - p.get(x, y + 1).getRed();
-        int gY = p.get(x, y - 1).getGreen() - p.get(x, y + 1).getGreen();
-        int bY = p.get(x, y - 1).getBlue() - p.get(x, y + 1).getBlue();
+    private double getYSq(int h, int w) {
+//        StdOut.println(0xFF & ((int) color[h-1][w] >> 16 ));
+//        StdOut.println(p.get(w, h - 1 ).getRed());
+//        StdOut.println(0xFF & ((int) color[h+1][w] >> 16 ));
+//        StdOut.println(p.get(w, h + 1 ).getRed());
+         int rY = (0xFF & ((int) color[h-1][w] >> 16 )) - (0xFF & ((int) color[h+1][w] >> 16 ));
+         int gY = (0xFF & ((int) color[h-1][w] >> 8 )) - (0xFF & ((int) color[h+1][w] >> 8 ));
+         int bY = (0xFF & ((int) color[h-1][w] )) - (0xFF & ((int) color[h+1][w] ));
+
+//StdOut.println("rY: " + rY + "| Expected: " +( p.get(w, h - 1 ).getRed() - p.get(w,h + 1 ).getRed()));
+//        int rY = p.get(x, y - 1).getRed() - p.get(x, y + 1).getRed();
+//        int gY = p.get(x, y - 1).getGreen() - p.get(x, y + 1).getGreen();
+//        int bY = p.get(x, y - 1).getBlue() - p.get(x, y + 1).getBlue();
         return Math.pow(rY, 2) + Math.pow(gY, 2) + Math.pow(bY, 2);
     }
 
-    private double getXSq(int x, int y) {
-        int rX = p.get(x + 1, y).getRed() - p.get(x - 1, y).getRed();
-        int gX = p.get(x + 1, y).getGreen() - p.get(x - 1, y).getGreen();
-        int bX = p.get(x + 1, y).getBlue() - p.get(x - 1, y).getBlue();
+    private double getXSq(int h, int w) {
+        //red component in bits 16-23, the green component in bits 8-15, and the blue component in bits 0-7.
+        //color int rX = (0xFF & (color[y][x + 1] >> 16)) - (0xFF & (color[y][x - 1] >> 16));
+        int rX = (0xFF & ((int) color[h][w + 1]  >> 16 )) - (0xFF & ((int) color [h][w-1] >> 16 ));
+        int gX = (0xFF & ((int) color[h][w + 1]  >> 8 )) - (0xFF & ((int) color [h][w-1] >> 8 ));
+        int bX = (0xFF & ((int) color[h][w + 1]  )) - (0xFF & ((int) color [h][w-1]  ));
+ //        int rX = p.get(x + 1, y).getRed() - p.get(x - 1, y).getRed();
+//        int gX = p.get(x + 1, y).getGreen() - p.get(x - 1, y).getGreen();
+//        int bX = p.get(x + 1, y).getBlue() - p.get(x - 1, y).getBlue();
         return Math.pow(rX, 2) + Math.pow(gX, 2) + Math.pow(bX, 2);
     }
 
@@ -228,7 +246,7 @@ public class SeamCarver {
         if (seam.length != height()) {
             throw new java.lang.IllegalArgumentException("seam is invalid");
         }
-        //double for loop going from top to bottom
+        //remove seam vertically
         for(int h = 0; h < height(); h++){
             for(int s = seam[h] + 1; s < width(); s++){
                 energy[h][s-1] = energy[h][s];
@@ -237,6 +255,16 @@ public class SeamCarver {
         }
         //reduce width after seam removal
         W--;
+//        StdOut.println("before seam recal");
+//        printEnergy();
+        //recalculate energy for pixels after seam removal
+        for (int h = 0; h < height(); h++) {
+            for (int s = seam[h]; s < width(); s++) {
+                energy[h][s] = energy(s,h);
+            }
+        }
+//        StdOut.println("after seam recal");
+//        printEnergy();
     }
     private void printEnergy(){
          for(int h = 0; h < height(); h++){
@@ -261,28 +289,28 @@ public class SeamCarver {
 //        sc.findVerticalSeam();
 //        //StdOut.println();
 //        sc.printEnergy();
-//        for(int a:sc.findVerticalSeam() )
-//            StdOut.println(a);
-//        sc.removeVerticalSeam(sc.findVerticalSeam());
-//        sc.printEnergy();
+        for(int a:sc.findVerticalSeam() )
+            StdOut.println(a);
+        sc.removeVerticalSeam(sc.findVerticalSeam());
+ //       sc.printEnergy();
  
-        sc.findVerticalSeam();
-        StdOut.println();
-        sc.printEnergy();
-        for(int a:sc.findHorizontalSeam())
-            StdOut.println(a);
-        sc.removeHorizontalSeam(sc.findHorizontalSeam());
-        sc.printEnergy();
-        StdOut.println("Remove second horizontal seam");
-        StdOut.println();
-        for (int a : sc.findHorizontalSeam()) {
-            StdOut.println(a);
-        }
-        sc.removeHorizontalSeam(sc.findHorizontalSeam());
-        sc.printEnergy();
-        StdOut.println(sc.findHorizontalSeam());
-        sc.removeHorizontalSeam(sc.findHorizontalSeam());
-        sc.printEnergy();
+//        sc.findVerticalSeam();
+//        StdOut.println();
+//        sc.printEnergy();
+//        for(int a:sc.findHorizontalSeam())
+//            StdOut.println(a);
+//        sc.removeHorizontalSeam(sc.findHorizontalSeam());
+//        sc.printEnergy();
+//        StdOut.println("Remove second horizontal seam");
+//        StdOut.println();
+//        for (int a : sc.findHorizontalSeam()) {
+//            StdOut.println(a);
+//        }
+//        sc.removeHorizontalSeam(sc.findHorizontalSeam());
+//        sc.printEnergy();
+//        StdOut.println(sc.findHorizontalSeam());
+//        sc.removeHorizontalSeam(sc.findHorizontalSeam());
+//        sc.printEnergy();
         
         //StdOut.println( sc.energy(1, 2));
     }
