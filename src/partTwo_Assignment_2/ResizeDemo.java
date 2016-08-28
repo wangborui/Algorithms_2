@@ -28,7 +28,7 @@ public class ResizeDemo {
                         + "Algorithms Part 2\\assignments\\ProgrammingAssignment2SeamCarvingHelpCenter\\"
                         + "seamCarving-testing\\seamCarving\\chameleon.png"));
         int removeColumns = 200;
-        int removeRows = 50;
+        int removeRows = 100;
 
         StdOut.printf("image is %d columns by %d rows\n", inputImg.width(), inputImg.height());
         SeamCarver sc = new SeamCarver(inputImg);

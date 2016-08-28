@@ -166,6 +166,15 @@ public class SeamCarver {
         int[] seam = new int[height()];
         double minVal = Integer.MAX_VALUE;
         int minIndex = -1;
+        //print all distances 
+//        StdOut.println("distance");
+//        for(double[]a:distance){
+//            for(double b: a){
+//                StdOut.printf("%9.0f ",b);
+//            }
+//            StdOut.println();
+//        }
+//        StdOut.println();
         //find the min value on the bottom row
         for (int i = 0; i < width(); i++) {
             if (distance[height() - 1][i] < minVal) {
@@ -173,11 +182,24 @@ public class SeamCarver {
                 minIndex = i;
             }
         }
+        
+//         StdOut.println("edgeTo");
+//        for(int[]a:edgeTo){
+//            for(int b: a){
+//                StdOut.printf("%9d ",b);
+//            }
+//            StdOut.println();
+//        }
+//        StdOut.println();
         int height = height() - 1;
         //trace edges back to the top root
-        for (int e = edgeTo[height][minIndex]; height >= 0; e = edgeTo[height--][e]) {
+        for (int e = minIndex; height >= 0; e = edgeTo[height--][e]) {
             seam[height] = e;
         }
+//          for(double b: seam){
+//                StdOut.printf("%9.0f ",b);
+//         }
+//           StdOut.println();
         return seam;
     }
 
@@ -278,13 +300,13 @@ public class SeamCarver {
 
         SeamCarver sc = new SeamCarver(picture);
         //remove all vertical seams one at a time
-//        int width =  sc.width();
+//         int width =  sc.width();
 //        for(int w = 0; w < width; w++){
 //            StdOut.println(w);
 //            sc.removeVerticalSeam(sc.findVerticalSeam());
 //            sc.printEnergy();
 //        }
-        sc.printEnergy();
+
         int height =  sc.height();
         for(int w = 0; w < height; w++){
             sc.removeHorizontalSeam(sc.findHorizontalSeam());
